@@ -17,12 +17,10 @@ yargs
     "migrate",
     "migrate notebooks from 0.4 to 0.5",
     (yargs) => {
-      yargs
-        .option("notebooks", {
-          type: "array",
-          description:
-            "A list of space-separated notebook path to migrate",
-        });
+      yargs.option("notebooks", {
+        type: "array",
+        description: "A list of space-separated notebook path to migrate",
+      });
     },
     migrate
   )
