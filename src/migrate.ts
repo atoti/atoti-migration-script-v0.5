@@ -13,7 +13,8 @@ import { migrateChart } from "./ui/migrateChart";
 
 type rule = (
   source: MultilineString,
-  metadata: CellMetadata
+  metadata: CellMetadata,
+  memory: {}
 ) => [MultilineString, CellMetadata];
 
 const warnS3 = (
@@ -66,6 +67,13 @@ const uiWidget = (
     if (widget.value && widget.value.containerKey === "chart") {
       console.log(`Migrating chart state`);
       widget = migrateChart(widget);
+
+      console.log(`Migrating chart's MDX`);
+      widget = _.cloneDeepWith(widget, (value) => {
+        if (typeof value === "string") {
+          return value.replace("[Hierarchies].", "[classified_products].");
+        }
+      });
     }
 
     return [source, Object.assign({}, metadata, { atoti: { widget } })];
@@ -76,6 +84,7 @@ const uiWidget = (
 
 const migrateNotebook = (original: Notebook, rules: rule[]) => {
   const copy = _.cloneDeep(original);
+  const memory = {};
 
   copy.cells = original.cells.map((cell) => {
     switch (cell.cell_type) {
@@ -84,7 +93,7 @@ const migrateNotebook = (original: Notebook, rules: rule[]) => {
         let metadataCopy = _.cloneDeep(cell.metadata);
 
         rules.forEach((rule) => {
-          [sourceCopy, metadataCopy] = rule(sourceCopy, metadataCopy);
+          [sourceCopy, metadataCopy] = rule(sourceCopy, metadataCopy, memory);
         });
 
         return Object.assign({}, cell, {
