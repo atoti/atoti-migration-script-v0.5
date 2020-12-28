@@ -21,6 +21,7 @@ Current known limitations:
 
 TODO:
 
+- implement tests
 - fix the script for pivot table
 - add more options to workaround inference assumptions mentioned above
 
