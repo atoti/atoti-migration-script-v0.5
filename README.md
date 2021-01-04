@@ -8,12 +8,12 @@ This is a work in progress. Feel free to contribute.
 
 Current assumptions:
 
-- atoti session variable is "session"
-- atoti cube name is "cube"
-- store variable is not redefined
-- store ".head()" method is used and all columns are displayed in the output (not too many columns). Otherwise, use the "--hierarchies" option.
-- measures are stored in m variable
-- any m["XXX.VALUE"] was an automatically created measure from 0.4.3
+- atoti session variable is `session`
+- atoti cube variable is `cube`
+- store variables are not redefined
+- store `.head()` method is used and all columns are displayed in the output (not too many columns). Otherwise, use the `--hierarchies` option.
+- measures are stored in an `m` variable
+- any `m["XXX.VALUE"]` was an automatically created measure from 0.4.3
 
 Current known limitations:
 
@@ -23,9 +23,18 @@ TODO:
 
 - implement tests
 - fix the script for pivot table
-- add more options to workaround inference assumptions mentioned above
+- add more options to workaround assumptions mentioned above
 
-### CLI
+### Setup & Usage
+
+### Setup
+
+- Run `yarn install` to install dependencies
+- Run `yarn build` to build the final script under `dist/index.js`
+- Run `yarn start --help` for usage information
+- Run `pkg dist/index.js` to create binaries
+
+#### Main usage
 
 ```console
 > atoti-helper --help
@@ -50,7 +59,7 @@ Examples:
   Competitor_prices_store:CompetitorName
 ```
 
-#### migrate
+#### Migrate usage
 
 ```console
 > atoti-helper migrate
