@@ -1,3 +1,4 @@
+import _ from "lodash";
 // import { Query } from "@activeviam/activepivot-client";
 // import { DataModel, getCube } from "dataModel";
 // import {
@@ -38,9 +39,26 @@ export const _getMappingFromQuery = (query: any, dataModel?: any): any => {
 
   //   const measures = getMeasures(mdx);
 
+  // return {
+  //   rows: levelsOnRows,
+  //   columns: ["ALL_MEASURES", ...levelsOnColumns],
+  //   measures: measures.map((measureName) => `[Measures].[${measureName}]`),
+  // };
+
+  const mdx = query.mdx;
+
+  const measures = [];
+  const measureRegex = /\[Measures\].\[([^\]]+)\]/gm;
+  let measureResults = measureRegex.exec(mdx);
+  while (measureResults) {
+    const measure = measureResults[0];
+    measures.push(measure);
+    measureResults = measureRegex.exec(mdx);
+  }
+
   return {
     rows: [], //levelsOnRows,
     columns: ["ALL_MEASURES"], //["ALL_MEASURES", ...levelsOnColumns],
-    measures: [], //measures.map((measureName) => `[Measures].[${measureName}]`),
+    measures: _.uniq(measures),
   };
 };

@@ -17,12 +17,12 @@ Current assumptions:
 
 Current known limitations:
 
-- does not work with pivot table or featured values.
+- does not work with featured values
+- does nor populate rows/columns for pivot table wizard
 
 TODO:
 
 - implement tests
-- fix the script for pivot table
 - add more options to workaround assumptions mentioned above
 
 ### Setup & Usage

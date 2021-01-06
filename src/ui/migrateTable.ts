@@ -8,7 +8,7 @@ import { DataModel } from "./dataModel";
 //   stringify,
 // } from "@activeviam/mdx";
 import { TableWidgetState } from "./table";
-// import { _getMappingFromQuery } from "./_getMappingFromQuery";
+import { _getMappingFromQuery } from "./_getMappingFromQuery";
 import { _getQueryInLegacyWidgetState } from "./_getQueryInLegacyWidgetState";
 import { _getServerKeyInLegacyWidgetState } from "./_getServerKeyInLegacyWidgetState";
 
@@ -28,16 +28,23 @@ export function migrateTable(
     dataModels
   );
   const query = _getQueryInLegacyWidgetState(legacyTableState);
-  //   const mapping = _getMappingFromQuery(query, dataModels?.[serverKey]);
+  const mapping = _getMappingFromQuery(query, dataModels?.[serverKey]);
   //   const mdx = parse<MdxSelect>(query.mdx);
   //   const filters = getFilters(mdx).map(({ mdx }) => stringify(mdx));
   //   const mdxWithoutFilters = setFilters(mdx, []);
   //   query.mdx = stringify(mdxWithoutFilters);
 
+  // add ctx values
+  if (query.contextValues !== undefined) {
+    query.context = query.contextValues;
+  }
+  query.context["queriesResultLimit.intermediateSize"] = 1000000;
+  query.context["queriesResultLimit.transientSize"] = 10000000;
+
   return {
     // filters,
     query,
-    // mapping,
+    mapping,
     name: legacyTableState.name,
     serverKey,
     widgetKey: "pivot-table",

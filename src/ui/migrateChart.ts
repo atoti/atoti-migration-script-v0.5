@@ -54,6 +54,16 @@ export function migrateChart(
     dataModels
   );
 
+  // add ctx values
+  if (query.contextValues !== undefined) {
+    query.context = query.contextValues;
+  }
+  if (query.context === undefined) {
+    query.context = {};
+  }
+  query.context["queriesResultLimit.intermediateSize"] = 1000000;
+  query.context["queriesResultLimit.transientSize"] = 10000000;
+
   if (type.startsWith("plotly-")) {
     return {
       ...configuration,

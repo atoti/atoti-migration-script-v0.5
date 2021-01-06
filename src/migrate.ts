@@ -14,7 +14,6 @@ import _ from "lodash";
 import fs from "fs";
 import { migrateChart } from "./ui/migrateChart";
 import { migrateTable } from "./ui/migrateTable";
-import { option } from "yargs";
 
 type rule = (options: {
   source: MultilineString;
@@ -232,6 +231,12 @@ const addValueMeasure: rule = ({
     let valueResults = valueRegex.exec(line);
     while (valueResults) {
       const numericField = valueResults[1];
+
+      if (memory.level2Hierarchy[numericField] === undefined) {
+        throw new Error(
+          `Could not find dimension for hierarchy ${numericField}. Add it in the script arguments`
+        );
+      }
 
       if (memory.measuresCreated[numericField] === undefined) {
         memory.measuresCreated[numericField] = true;
