@@ -3,6 +3,12 @@ import fs from "fs";
 import path from "path";
 
 export type MigrateOptions = {
+  notebooks: { content: any; path: string }[];
+  hierarchies: string[];
+  debug?: Function;
+};
+
+export type MigrateCLIOptions = {
   notebooks: string[];
   hierarchies: string[];
 };

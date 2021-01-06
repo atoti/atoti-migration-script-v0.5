@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import yargs from "yargs";
-import { migrate } from "./migrate";
+import { migrateCLI } from "./migrate";
 
 yargs
   .scriptName("atoti-helper")
@@ -31,7 +31,7 @@ yargs
           description: "A list of space-separated dimension:hierarchy",
         });
     },
-    migrate
+    migrateCLI
   )
   .demandCommand(1, "")
   .help().argv;

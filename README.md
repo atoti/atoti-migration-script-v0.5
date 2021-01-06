@@ -6,7 +6,7 @@ Migrate atoti notebooks from 0.4.3 to 0.5.x
 
 This is a work in progress. Feel free to contribute.
 
-Current assumptions:
+Assumptions:
 
 - atoti session variable is `session`
 - atoti cube variable is `cube`
@@ -15,24 +15,20 @@ Current assumptions:
 - measures are stored in an `m` variable
 - any `m["XXX.VALUE"]` was an automatically created measure from 0.4.3
 
-Current known limitations:
+Known limitations:
 
 - does not work with featured values
 - does nor populate rows/columns for pivot table wizard
 
-TODO:
-
-- implement tests
-- add more options to workaround assumptions mentioned above
-
 ### Setup & Usage
 
-### Setup
+### Setup & Test
 
 - Run `yarn install` to install dependencies
 - Run `yarn build` to build the final script under `dist/index.js`
 - Run `yarn start --help` for usage information
 - Run `pkg dist/index.js` to create binaries
+- Run `yarn test` to run the test
 
 #### Main usage
 

@@ -2,6 +2,7 @@ import path from "path";
 import {
   exportData,
   MigrateOptions,
+  MigrateCLIOptions,
   printExtractSummary,
   Notebook,
   MultilineString,
@@ -20,6 +21,7 @@ type rule = (options: {
   metadata: CellMetadata;
   outputs: Output[];
   memory: any;
+  debug: Function;
 }) => [MultilineString, CellMetadata];
 
 // ASSUMPTION = atoti session variable is "session"
@@ -28,6 +30,7 @@ const extractStores: rule = ({
   source,
   metadata,
   memory,
+  debug,
 }): [MultilineString, CellMetadata] => {
   if (memory.storeVar2Name === undefined) {
     memory.storeVar2Name = {};
@@ -68,7 +71,7 @@ const extractStores: rule = ({
   }
 
   if (storeName && storeVariable) {
-    console.log(`Found store ${storeName} stored in ${storeVariable}!`);
+    debug(`Found store ${storeName} stored in ${storeVariable}!`);
   }
 
   memory.storeVar2Name[storeVariable] = storeName;
@@ -83,6 +86,7 @@ const extractStoreLevels: rule = ({
   metadata,
   outputs,
   memory,
+  debug,
 }): [MultilineString, CellMetadata] => {
   if (memory.level2Hierarchy === undefined) {
     memory.level2Hierarchy = {};
@@ -93,7 +97,7 @@ const extractStoreLevels: rule = ({
       const headRegex = new RegExp(_.escapeRegExp(`${storeVariable}.head()`));
 
       if (headRegex.test(line)) {
-        console.log(`${storeName} HEAD FOUND!`);
+        debug(`${storeName} HEAD FOUND!`);
 
         const execResults = outputs.filter(
           (output) => output.output_type === OutputType.ExecuteResult
@@ -135,10 +139,11 @@ const extractStoreLevels: rule = ({
 const warnS3: rule = ({
   source,
   metadata,
+  debug,
 }): [MultilineString, CellMetadata] => {
   const doWarnS3 = (line: string) => {
     if (line.includes("s3://")) {
-      console.log(`Please install the plugin atoti-aws`);
+      debug(`Please install the plugin atoti-aws`);
     }
   };
   if (typeof source === "string") {
@@ -155,10 +160,11 @@ const warnS3: rule = ({
 const cubeVisualize: rule = ({
   source,
   metadata,
+  debug,
 }): [MultilineString, CellMetadata] => {
   const doCubeVisualize = (line: string): string => {
     if (line.includes("cube.visualize")) {
-      console.log(`Migrating "cube.visualize" to "session.visualize"...`);
+      debug(`Migrating "cube.visualize" to "session.visualize"...`);
       return line.replace("cube.visualize", "session.visualize");
     } else {
       return line;
@@ -175,18 +181,19 @@ const uiWidget: rule = ({
   source,
   metadata,
   memory,
+  debug,
 }): [MultilineString, CellMetadata] => {
   if (metadata.atoti && metadata.atoti.state) {
     let widget = metadata.atoti.state;
 
     if (widget.value && widget.value.containerKey === "chart") {
-      console.log(`Migrating chart state...`);
+      debug(`Migrating chart state...`);
       widget = migrateChart(widget);
     } else if (widget.value && widget.value.containerKey === "pivot-table") {
-      console.log(`Migrating pivot table state...`);
+      debug(`Migrating pivot table state...`);
       widget = migrateTable(widget);
     } else {
-      console.log(`Migrating widget metadata to new format...`);
+      debug(`Migrating widget metadata to new format...`);
     }
 
     // Migrating MDX
@@ -263,7 +270,7 @@ const addValueMeasure: rule = ({
 const migrateNotebook = (
   original: Notebook,
   rules: rule[],
-  options: { hierarchies: string[] }
+  options: { hierarchies: string[]; debug: Function }
 ) => {
   const copy = _.cloneDeep(original);
   const memory = {
@@ -277,7 +284,7 @@ const migrateNotebook = (
     });
   }
 
-  console.log(memory);
+  options.debug(memory);
 
   copy.cells = original.cells.map((cell) => {
     switch (cell.cell_type) {
@@ -292,6 +299,7 @@ const migrateNotebook = (
             metadata,
             outputs,
             memory,
+            debug: options.debug,
           });
         });
 
@@ -308,19 +316,19 @@ const migrateNotebook = (
     return cell;
   });
 
-  console.log(JSON.stringify(memory, null, 2));
+  options.debug(JSON.stringify(memory, null, 2));
   return copy;
 };
 
-export const migrate = async ({ notebooks, hierarchies }: MigrateOptions) => {
-  const notebooksContent = notebooks.map((notebook) =>
-    JSON.parse(fs.readFileSync(notebook, { encoding: "utf-8" }))
-  );
-
-  notebooks.forEach((notebook, i) => {
+export const migrate = ({
+  notebooks,
+  hierarchies,
+  debug = () => {},
+}: MigrateOptions) => {
+  const results = notebooks.map((notebook) => {
     const content = JSON.stringify(
       migrateNotebook(
-        notebooksContent[i],
+        notebook.content,
         [
           extractStores,
           extractStoreLevels,
@@ -329,22 +337,39 @@ export const migrate = async ({ notebooks, hierarchies }: MigrateOptions) => {
           uiWidget,
           addValueMeasure,
         ],
-        { hierarchies }
+        { hierarchies, debug }
       ),
       null,
       2
     );
 
-    const oldParsedPath = path.parse(notebook);
+    const oldParsedPath = path.parse(notebook.path);
     const newPath = path.join(
       oldParsedPath.dir,
       oldParsedPath.name + "-v0.5" + oldParsedPath.ext
     );
 
-    exportData({
+    return {
       content,
       filePath: newPath,
-    });
+    };
+  });
+
+  return results;
+};
+
+export const migrateCLI = ({ notebooks, hierarchies }: MigrateCLIOptions) => {
+  const notebooksInfo = notebooks.map((notebook) => ({
+    path: notebook,
+    content: JSON.parse(fs.readFileSync(notebook, { encoding: "utf-8" })),
+  }));
+
+  migrate({
+    notebooks: notebooksInfo,
+    hierarchies,
+    debug: console.log.bind(console),
+  }).forEach((result) => {
+    exportData(result);
   });
 
   printExtractSummary({ notebooks });

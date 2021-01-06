@@ -18,9 +18,9 @@ export const _getServerKeyInLegacyWidgetState = (
   // "default" is the serverKey used by Atoti.
   const fallbackServerKey = dataModels ? Object.keys(dataModels)[0] : "default";
 
-  console.warn(
-    `Could not find the serverKey for widget "${legacyWidgetState.name}". Using "${fallbackServerKey}" instead.`
-  );
+  // console.warn(
+  //   `Could not find the serverKey for widget "${legacyWidgetState.name}". Using "${fallbackServerKey}" instead.`
+  // );
 
   return fallbackServerKey;
 };
