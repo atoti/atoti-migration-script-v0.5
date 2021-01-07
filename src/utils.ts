@@ -2,6 +2,14 @@ import _ from "lodash";
 import fs from "fs";
 import path from "path";
 
+export type Rule = (options: {
+  source: MultilineString;
+  metadata: CellMetadata;
+  outputs: Output[];
+  memory: any;
+  debug: Function;
+}) => [MultilineString, CellMetadata];
+
 export type MigrateOptions = {
   notebooks: { content: any; path: string }[];
   hierarchies: string[];

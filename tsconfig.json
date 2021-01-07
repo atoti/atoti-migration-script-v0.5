@@ -8,6 +8,9 @@
     "moduleResolution": "node",
     "outDir": "dist",
     "sourceMap": true,
-    "baseUrl": "."
-  }
+    "baseUrl": ".",
+    "rootDir": "./src"
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["**/*.test.ts"]
 }

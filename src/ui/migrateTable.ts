@@ -1,4 +1,5 @@
 import { DataModel } from "./dataModel";
+import _ from "lodash";
 // import {
 //   getFilters,
 //   MdxSelect,
@@ -36,7 +37,8 @@ export function migrateTable(
 
   // add ctx values
   if (query.contextValues !== undefined) {
-    query.context = query.contextValues;
+    query.context = _.cloneDeep(query.contextValues);
+    Reflect.deleteProperty(query, "contextValues");
   }
   query.context["queriesResultLimit.intermediateSize"] = 1000000;
   query.context["queriesResultLimit.transientSize"] = 10000000;

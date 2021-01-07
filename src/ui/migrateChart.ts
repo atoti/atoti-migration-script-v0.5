@@ -1,6 +1,7 @@
 import _mapValues from "lodash/mapValues";
 import _omit from "lodash/omit";
 import _isArray from "lodash/isArray";
+import _ from "lodash";
 
 import { PlotlyWidgetState } from "./chart";
 // import {
@@ -56,7 +57,8 @@ export function migrateChart(
 
   // add ctx values
   if (query.contextValues !== undefined) {
-    query.context = query.contextValues;
+    query.context = _.cloneDeep(query.contextValues);
+    Reflect.deleteProperty(query, "contextValues");
   }
   if (query.context === undefined) {
     query.context = {};
