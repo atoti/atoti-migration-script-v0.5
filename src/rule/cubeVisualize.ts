@@ -10,7 +10,7 @@ export const cubeVisualize: Rule = ({
   const doCubeVisualize = (line: string): string => {
     if (line.includes("cube.visualize")) {
       debug(`Migrating "cube.visualize" to "session.visualize"...`);
-      return line.replace("cube.visualize", "session.visualize");
+      return line.replace(/[^ \.]*cube\.visualize/g, "session.visualize");
     } else {
       return line;
     }

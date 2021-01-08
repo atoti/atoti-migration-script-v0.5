@@ -21,3 +21,19 @@ test("Correctly migrate pricing simulation notebook", () => {
     })
   ).toMatchSnapshot();
 });
+
+test("Correctly migrate food processing notebook", () => {
+  const path = "test/food-processing.ipynb";
+
+  expect(
+    migrate({
+      notebooks: [
+        {
+          content: JSON.parse(fs.readFileSync(path, { encoding: "utf-8" })),
+          path,
+        },
+      ],
+      hierarchies: ["product_storage:storage_capacity"],
+    })
+  ).toMatchSnapshot();
+});

@@ -15,6 +15,8 @@ import { warnS3 } from "./rule/warnS3";
 import { cubeVisualize } from "./rule/cubeVisualize";
 import { uiWidget } from "./rule/uiWidget";
 import { addValueMeasure } from "./rule/addValueMeasure";
+import { atotiTypes } from "./rule/atotiTypes";
+import { atotiMath } from "./rule/atotiMath";
 
 const migrateNotebook = (
   original: Notebook,
@@ -83,6 +85,8 @@ export const migrate = ({
           extractStoreLevels,
           warnS3,
           cubeVisualize,
+          atotiTypes,
+          atotiMath,
           uiWidget,
           addValueMeasure,
         ],
