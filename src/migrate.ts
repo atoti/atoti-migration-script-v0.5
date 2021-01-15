@@ -17,6 +17,7 @@ import { uiWidget } from "./rule/uiWidget";
 import { addValueMeasure } from "./rule/addValueMeasure";
 import { atotiTypes } from "./rule/atotiTypes";
 import { atotiMath } from "./rule/atotiMath";
+import { atotiFunctionSwitch } from "./rule/atotiFunctionSwitch";
 
 const migrateNotebook = (
   original: Notebook,
@@ -87,6 +88,7 @@ export const migrate = ({
           cubeVisualize,
           atotiTypes,
           atotiMath,
+          atotiFunctionSwitch,
           uiWidget,
           addValueMeasure,
         ],
